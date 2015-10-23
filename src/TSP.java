@@ -3,24 +3,26 @@
  */
 public class TSP {
 
-    public static double[] xloc;
-    public static double[] yloc;
-    public static  String[] cityNames;
-    public static int numCities;
-    public static double[][] tspArr;
+    public static double[] xloc = new double[]{20, 5, 10, 15, 20, 25, 30};
+    public static double[] yloc = new double[]{68, 10, 50, 100, 30, 110, 70};
+    public static  String[] cityNames = new String[]{"A", "B", "C", "D", "E", "F", "G"};
+    public static int numCities = cityNames.length;
+    public static double[][] adjMatrix = new double[numCities][numCities];
     public static int[] visited;
     public static double minTour = 0;
 
     public static  double calcDistance(double x1, double x2, double y1, double y2){
-        return Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
+        double x = Math.pow(x1-x2, 2);
+        double y = Math.pow(y1-y2, 2);
+        return Math.sqrt(Math.sqrt(x + y));
     }
 
     public static void init(){
         for(int i = 0; i < numCities; i++){
             for(int j = 0; j < numCities; j++){
                 double dist = calcDistance(xloc[i], xloc[j], yloc[i],  yloc[j]);
-                tspArr[i][j] = dist;
-                tspArr[j][i] = dist;
+                adjMatrix[i][j] = dist;
+                adjMatrix[j][i] = dist;
             }
         }
     }
@@ -33,32 +35,67 @@ public class TSP {
     }
 
     public static void permute(String[] a,int k ) {
-        if(k==a.length){
-            //printArray(a);
+        for (int i = k; i < a.length; i++) {
+            String str = a[k];
+            a[k] = a[i];
+            a[i] = str;
+            permute(a, k + 1);
+            str = a[k];
+            a[k] = a[i];
+            a[i] = str;
         }
-        else{
-            for(int i = k; i < a.length; i++){
-                String temp=a[k];
-                a[k]=a[i];
-                a[i]=temp;
-                permute(a,k+1);
-                temp=a[k];
-                a[k]=a[i];
-                a[i]=temp;
-            }
+        if (k == a.length) {
+            //printArray(a);
         }
     }
     
     public static double bruteForce(){
+
         return 0;
     }
     
-    public static double greedyTSP(){
+    public static double greedyTSP(String[] start){
+        //initialize start city
+        //select shortest unvisited city as next to be visited
+        //do until all visited
+        //return to start city
+        String startCity = start[0];
+        System.out.println(startCity);
+
+
         return 0;
     }
     
     public static double minSTM(){
+        //distance matrix of distances between all vertices i and j...adj matrix graph G
+        //find min span tree of G using Prims alg
+            //start at startCity
+            //call tree T (in adj matrix form)
+            //run dfs of T starting from startCity
+            //output nodes in visited order to array w[]
+                //aprox tour will be w[0],w[1],..w[n-1],[w0]
+
         return 0;
+    }
+
+    public void dfsTraversal(int vertex) {
+
+        visited = new int[numCities];
+        System.out.print("DFS: ");
+        rdfsTraversal(vertex);
+        System.out.println();
+    }
+
+    public void rdfsTraversal(int i) {
+        visited[i] = 1;
+
+        System.out.print(i + " ");
+
+        for(int j = 0; j < numCities; j++)
+            if(adjMatrix[i][j] == 1 && visited[j] == 0) {
+                rdfsTraversal(j);
+            }
+
     }
 
     public static void visit(int nc) {
@@ -70,13 +107,9 @@ public class TSP {
 
     public static void main(String[] args) {
 
-        cityNames = new String[]{"A", "B", "C", "D", "E", "F", "G"};
-        numCities = cityNames.length;
-        xloc = new double[]{20, 5, 10, 15, 20, 25, 30};
-        yloc = new double[]{68, 10, 50, 100, 30, 110, 70};
-        tspArr = new double[numCities][numCities];
-
         init();
         permute(cityNames, 0);
+        greedyTSP(cityNames);
+
     }
 }
