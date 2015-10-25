@@ -63,17 +63,50 @@ public class TSP {
         //select shortest unvisited city as next to be visited
         //do until all visited
         //return to start city
-        int i = 0; //start city
-        int j = 0;
-        String startCity = start[0];
-        System.out.println("Start City: " + startCity);
-        visited[i] = 1;
-        System.out.println("Visited " + start[i]);
-        double[] v = new double[numCities]; //next closest city to visit
 
+        /*
+        starting at A, output should be
+        A G C E B D F ... return to A
+         */
+
+        double[] v = new double[numCities]; //next closest city to visit
         double sumTour = 0;
+        int sCity = 0; //start city
+        int index = 0; //index returned from returnSmallest
 
         ///////////////////////////////////////
+
+        System.out.println("Start City: " + start[sCity]);
+        visited[sCity] = 1;
+        System.out.println("Visited " + start[sCity]);
+
+
+        //loop through all cities
+            //check next shortest city
+            //see if visited
+            //if not visited, go to that city
+            //mark visited
+            //repeat
+        index = returnSmallest(sCity, 0);
+        for (int c = 0; c < numCities; c++) {
+
+            if(visited[index] == 0) {
+                index = returnSmallest(sCity, 0);
+                System.out.println("Visited " + start[index]);
+                visited[index] = 1;
+                sCity = index;
+            }
+            else {
+                //if visited find next shortest
+                index = nextSmallest(sCity);
+                if(visited[index] == 0) {
+                    System.out.println("Visited " + start[index]);
+                    visited[index] = 1;
+                    sCity = index;
+                }
+            }
+        }
+
 
 
         //for total sum
@@ -87,24 +120,23 @@ public class TSP {
     }
 
 
-    public static double returnSmallest() {
-        System.out.println();
+    public static int returnSmallest(int j, int c) {
+        //System.out.println();
         double[] arr = new double[numCities];
 
-        int j = 0;
         //copy row j into new array
         for(int i = 0; i < numCities; i++) {
-            arr[i] = adjMatrix[0][j];
-            j++;
+            arr[i] = adjMatrix[j][c];
+            c++;
         }
 
-        System.out.println(Arrays.toString(arr));
+        //System.out.println(Arrays.toString(arr));
 
         double small = 0;
         int index = 0;
         double[] sortedArr = arr.clone();
         Arrays.sort(sortedArr);
-        System.out.println(Arrays.toString(sortedArr));
+        //System.out.println(Arrays.toString(sortedArr));
 
         //find smallest value in array
         for(int k = 0; k < sortedArr.length; k ++){
@@ -120,8 +152,34 @@ public class TSP {
                 index = i;
             }
 
-        System.out.println("smallest is " + small + " at index " + index);
-        return small;
+        //System.out.println("smallest is " + small + " at index " + index);
+        return index;
+    }
+    public static int nextSmallest(int j) {
+        //System.out.println();
+        double[] arr = new double[numCities];
+        int c = 0;
+
+        //copy row j into new array
+        for(int i = 0; i < numCities; i++) {
+            arr[i] = adjMatrix[j][c];
+            c++;
+        }
+
+        double small = 0;
+        int index = 0;
+        double[] sortedArr = arr.clone();
+        Arrays.sort(sortedArr);
+        small = sortedArr[2];
+
+        //find index of smallest value in original array
+        for(int i=0; i<arr.length; i++)
+            if(arr[i] == small) {
+                index = i;
+            }
+
+        //System.out.println("smallest is " + small + " at index " + index);
+        return index;
     }
 
     
@@ -178,10 +236,12 @@ public class TSP {
             System.out.println();
         }
 
-        returnSmallest();
+        //returnSmallest(0);
+        //nextSmallest(6);
+
+        greedyTSP(cityNames);
 
 
-        //greedyTSP(cityNames);
 
 
 
