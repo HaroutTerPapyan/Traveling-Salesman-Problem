@@ -87,17 +87,20 @@ public class TSP {
             //if not visited, go to that city
             //mark visited
             //repeat
-        index = returnSmallest(sCity, 0);
+        index = returnSmallest(sCity);
         for (int c = 0; c < numCities; c++) {
 
             if(visited[index] == 0) {
-                index = returnSmallest(sCity, 0);
+                index = returnSmallest(sCity);
                 System.out.println("Visited " + start[index]);
                 visited[index] = 1;
                 sCity = index;
             }
             else {
                 //if visited find next shortest
+                /*
+                possible sol: make nextSmallest return sorted array. check visited, return index that has not been visited
+                 */
                 index = nextSmallest(sCity);
                 if(visited[index] == 0) {
                     System.out.println("Visited " + start[index]);
@@ -120,10 +123,10 @@ public class TSP {
     }
 
 
-    public static int returnSmallest(int j, int c) {
+    public static int returnSmallest(int j) {
         //System.out.println();
         double[] arr = new double[numCities];
-
+        int c = 0;
         //copy row j into new array
         for(int i = 0; i < numCities; i++) {
             arr[i] = adjMatrix[j][c];
@@ -166,7 +169,7 @@ public class TSP {
             c++;
         }
 
-        double small = 0;
+        double small;
         int index = 0;
         double[] sortedArr = arr.clone();
         Arrays.sort(sortedArr);
