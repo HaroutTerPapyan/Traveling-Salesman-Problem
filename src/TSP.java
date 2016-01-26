@@ -1,3 +1,9 @@
+package tsp;
+
+/**
+ *
+ * @author Harout
+ */
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -6,19 +12,31 @@ import java.util.Arrays;
  */
 public class TSP {
 
-    public static double[] xloc = new double[]{20, 5, 10, 15, 20, 25, 30};
-    public static double[] yloc = new double[]{68, 10, 50, 100, 30, 110, 70};
-    public static  String[] cityNames = new String[]{"A", "B", "C", "D", "E", "F", "G"};
+    //test case
+//    public static double[] xloc = new double[]{20, 5, 10, 15, 20, 25, 30};
+//    public static double[] yloc = new double[]{68, 10, 50, 100, 30, 110, 70};
+//    public static  String[] cityNames = new String[]{"A", "B", "C", "D", "E", "F", "G"};
+    
+    //test case 1
+//    public static double[] xloc = new double[]{79, 57, 24, 20, 46};
+//    public static double[] yloc = new double[]{45, 18, 46, 5, 27};
+//    public static  String[] cityNames = new String[]{"A", "B", "C", "D", "E"};
+    
+    //test case 2
+    public static double[] xloc = new double[]{48, 181, 26, 99, 107, 54, 98, 117, 119, 185, 68, 136};
+    public static double[] yloc = new double[]{42, 51, 93, 85, 90, 184, 118, 176, 32, 72, 32, 142};
+    public static  String[] cityNames = new String[]{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"};
+    public static String[] cNameCopy = new String[]{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"};
+    
     public static int numCities = cityNames.length;
     public static double[][] adjMatrix = new double[numCities][numCities];
     public static int[] visited = new int[numCities];
-    //public static ArrayList v; //visited array list
     public static double minTour = 0;
 
     public static  double calcDistance(double x1, double x2, double y1, double y2){
         double x = Math.pow(x1-x2, 2);
         double y = Math.pow(y1-y2, 2);
-        return Math.sqrt(Math.sqrt(x + y));
+        return Math.sqrt(x + y);
     }
 
     public static void distances(){
@@ -52,6 +70,7 @@ public class TSP {
             //printArray(a);
         }
     }
+
     
     public static double bruteForce(){
 
@@ -68,54 +87,46 @@ public class TSP {
         starting at A, output should be
         A G C E B D F ... return to A
          */
+        
+        
 
-        double[] v = new double[numCities]; //next closest city to visit
+        double[] v = new double[100]; //visited cities array
+        int[] sfe = new int[numCities]; //shortest path from each node
         double sumTour = 0;
         int sCity = 0; //start city
-        int index = 0; //index returned from returnSmallest
-
-        ///////////////////////////////////////
-
-        System.out.println("Start City: " + start[sCity]);
-        visited[sCity] = 1;
-        System.out.println("Visited " + start[sCity]);
-
-
+        int index = 0; //index returned from returnSmallest and nextSmallest
+        visit(numCities);
+   
         //loop through all cities
             //check next shortest city
             //see if visited
             //if not visited, go to that city
             //mark visited
             //repeat
-        index = returnSmallest(sCity);
-        for (int c = 0; c < numCities; c++) {
 
-            if(visited[index] == 0) {
-                index = returnSmallest(sCity);
-                System.out.println("Visited " + start[index]);
+        System.out.println("Start City: " + start[sCity]);
+        //System.out.println("Visited " + sCity);
+        index = returnSmallest(sCity);
+        //System.out.println("Visited: " + index + " " + cNameCopy[index]);
+        //v[index] = nextSmallestDistance(sCity);
+        visited[sCity] = 1;
+        
+        for(int i = 0; i < numCities; i++) {
+                index = nextSmallest(sCity); 
+                v[i] = nextSmallestDistance(sCity);
+                //System.out.println("Visited: " + index + " " + cNameCopy[index]);
+                //System.out.println("Visited: " + start[sCity]);
+                
                 visited[index] = 1;
-                sCity = index;
-            }
-            else {
-                //if visited find next shortest
-                /*
-                possible sol: make nextSmallest return sorted array. check visited, return index that has not been visited
-                 */
-                index = nextSmallest(sCity);
-                if(visited[index] == 0) {
-                    System.out.println("Visited " + start[index]);
-                    visited[index] = 1;
-                    sCity = index;
-                }
-            }
+                sCity = index;    
         }
 
+         
 
-
-        //for total sum
+        //total sum
         for (double k : v)
                 sumTour += k;
-
+        sumTour = sumTour + adjMatrix[numCities-1][0];
         System.out.println("total cost of tour " + sumTour);
 
         return sumTour;
@@ -130,7 +141,9 @@ public class TSP {
         //copy row j into new array
         for(int i = 0; i < numCities; i++) {
             arr[i] = adjMatrix[j][c];
-            c++;
+            c++;                
+
+  
         }
 
         //System.out.println(Arrays.toString(arr));
@@ -158,23 +171,41 @@ public class TSP {
         //System.out.println("smallest is " + small + " at index " + index);
         return index;
     }
-    public static int nextSmallest(int j) {
+    
+        public static int nextSmallest(int j) {
         //System.out.println();
         double[] arr = new double[numCities];
         int c = 0;
 
         //copy row j into new array
         for(int i = 0; i < numCities; i++) {
-            arr[i] = adjMatrix[j][c];
-            c++;
+            if(visited[i] != 1) {
+                arr[i] = adjMatrix[j][c];
+                c++;
+            }
+            else {
+                arr[i] = 0;
+                c++;
+            }
+                
+            
         }
+        //System.out.println(Arrays.toString(arr));
 
-        double small;
+        double small = 0;
         int index = 0;
         double[] sortedArr = arr.clone();
         Arrays.sort(sortedArr);
-        small = sortedArr[2];
+        //small = sortedArr[2];
 
+        //find smallest value in array
+        for(int k = 0; k < sortedArr.length; k ++){
+            if (sortedArr[k] > 0) {
+                small = sortedArr[k];
+                break;
+            }
+        }
+        
         //find index of smallest value in original array
         for(int i=0; i<arr.length; i++)
             if(arr[i] == small) {
@@ -182,8 +213,132 @@ public class TSP {
             }
 
         //System.out.println("smallest is " + small + " at index " + index);
+        System.out.println("Visited: " + index + " " + cNameCopy[index]);
         return index;
     }
+        
+    public static double nextSmallestDistance(int j) {
+        //System.out.println();
+        double[] arr = new double[numCities];
+        int c = 0;
+
+        //copy row j into new array
+        for(int i = 0; i < numCities; i++) {
+            if(visited[i] != 1) {
+                arr[i] = adjMatrix[j][c];
+                c++;
+            }
+            else {
+                arr[i] = 0;
+                c++;
+            }
+                
+            
+        }
+        //System.out.println(Arrays.toString(arr));
+
+        double small = 0;
+        int index = 0;
+        double[] sortedArr = arr.clone();
+        Arrays.sort(sortedArr);
+        //small = sortedArr[2];
+
+        //find smallest value in array
+        for(int k = 0; k < sortedArr.length; k ++){
+            if (sortedArr[k] > 0) {
+                small = sortedArr[k];
+                break;
+            }
+        }
+        
+        //find index of smallest value in original array
+        for(int i=0; i<arr.length; i++)
+            if(arr[i] == small) {
+                index = i;
+            }
+
+        //System.out.println("smallest is " + small + " at index " + index);
+        return small;
+    }
+    
+//    public static double[] shortestPath(int j) {
+//        //System.out.println();
+//        double[] arr = new double[numCities];
+//        int c = 0;
+//        //copy row j into new array
+//        for(int i = 0; i < numCities; i++) {
+//            arr[i] = adjMatrix[j][c];
+//            c++;
+//        }
+//
+//        //System.out.println(Arrays.toString(arr));
+//
+//        double small = 0;
+//        int index = 0;
+//        double[] sortedArr = arr.clone();
+//        Arrays.sort(sortedArr);
+//        //System.out.println(Arrays.toString(sortedArr));
+//
+//        //find smallest value in array
+//        for(int k = 0; k < sortedArr.length; k ++){
+//            if (sortedArr[k] > 0) {
+//                small = sortedArr[k];
+//                break;
+//            }
+//        }
+//
+//        //find index of smallest value in original array
+//        for(int i=0; i<arr.length; i++)
+//            if(arr[i] == small) {
+//                index = i;
+//            }
+//
+//        //System.out.println("smallest is " + small + " at index " + index);
+//        //System.out.println(Arrays.toString(arr));
+//        return arr;
+//    }
+//    
+//    public static int nextShortest(int j) {
+//        //System.out.println();
+//        double[] arr = new double[numCities];
+//        int c = 0;
+//        //copy row j into new array
+//        for(int i = 0; i < numCities; i++) {
+//            arr[i] = adjMatrix[j][c];
+//            c++;
+//        }
+//        
+//        int s = 0;
+//        int[] newArr = new int[numCities];
+//        
+//
+//        //System.out.println(Arrays.toString(arr));
+//
+//        double small = 0;
+//        int index = 0;
+//        double[] sortedArr = arr.clone();
+//        Arrays.sort(sortedArr);
+//        //System.out.println(Arrays.toString(sortedArr));
+//
+//        //find smallest value in array
+//        for(int k = 0; k < sortedArr.length; k ++){
+//            if (sortedArr[k] > 0 ) {
+//                small = sortedArr[k];
+//                break;
+//            }
+//        }
+//
+//        //find index of smallest value in original array
+//        for(int i=0; i<arr.length; i++)
+//            if(arr[i] == small) {
+//                index = i;
+//            }
+//
+//        //System.out.println("smallest is " + small + " at index " + index);
+//        return index;
+//    }
+//    
+
 
     
     public static double minSTM(){
@@ -198,34 +353,15 @@ public class TSP {
         return 0;
     }
 
-    /*
-    public void dfsTraversal(int vertex) {
-
-        visited = new int[numCities];
-        System.out.print("DFS: ");
-        rdfsTraversal(vertex);
-        System.out.println();
-    }
-
-    public void rdfsTraversal(int i) {
-        visited[i] = 1;
-
-        System.out.print(i + " ");
-
-        for(int j = 0; j < numCities; j++)
-            if(adjMatrix[i][j] == 1 && visited[j] == 0) {
-                rdfsTraversal(j);
-            }
-
-    }
 
     public static void visit(int nc) {
         visited = new int[nc];
         for(int m = 0; m < visited.length ; m++){
             visited[m] = 0;
         }
+        //System.out.println(Arrays.toString(visited));
     }
-*/
+
     public static void main(String[] args) {
 
         distances();
@@ -243,10 +379,6 @@ public class TSP {
         //nextSmallest(6);
 
         greedyTSP(cityNames);
-
-
-
-
 
 
     }
